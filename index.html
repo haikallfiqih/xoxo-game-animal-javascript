@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JavaScript Game</title>
+    <style>
+      body {
+        background-color: #f0f0f0;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+
+      #game-board {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 200px;
+        margin: 20px auto;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: #fff;
+      }
+
+      .game-square {
+        width: 50px;
+        height: 50px;
+        background-color: #eceded;
+        border-radius: 5px;
+        display: inline-block;
+        margin: 5px;
+        text-align: center;
+        font-size: 24px;
+        cursor: pointer;
+      }
+
+      .game-square:hover {
+        background-color: #9d9bf3;
+      }
+
+      .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 20px;
+        background-color: #0d44b2;
+        border-radius: 50%;
+        transform: translate(-100%, -100%);
+      }
+
+      .sparkle {
+        animation: sparkle 2s ease-in-out infinite;
+      }
+
+      @keyframes sparkle {
+        0% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(100px, -50px);
+        }
+        100% {
+          transform: translate(-100%, -100%);
+        }
+      }
+
+      .glitter {
+        animation: glitter 2s ease-in-out infinite;
+      }
+
+      @keyframes glitter {
+        0% {
+          opacity: 1;
+        }
+        20% {
+          opacity: 0.5;
+        }
+        40% {
+          opacity: 0;
+        }
+        60% {
+          opacity: 0.5;
+        }
+        80% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body
+    style="
+      display: flex;
+      min-height: max-content;
+      min-width: max-content;
+      text-align: center;
+    "
+  >
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+        "
+      >
+        <h1 style="padding-bottom: 20px">XOX</h1>
+        <p>Choose your character</p>
+        <div id="choose-player"></div>
+        <br />
+        <div
+          style="
+            display: flex;
+            outline: #0d44b2;
+            justify-content: center;
+            width: 100%;
+          "
+        >
+          <div style="margin-right: 10px">
+            Player 1: <span id="player1"></span>
+          </div>
+          <div>Computer: <span id="computer"></span></div>
+        </div>
+        <div id="game-board"></div>
+      </div>
+
+      <div
+        id="confetti"
+        style="
+          display: none;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100vh;
+          background-color: red;
+        "
+      >
+        <div class="sparkle"></div>
+        <div class="glitter"></div>
+        <div class="confetti-piece">aadada</div>
+        <div class="confetti-piece">aadada</div>
+        <div class="confetti-piece">aadada</div>
+      </div>
+    </div>
+
+    <script>
+      let characters = ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨"];
+
+      let player1 = characters[Math.floor(Math.random() * characters.length)];
+      let computer = characters[Math.floor(Math.random() * characters.length)];
+
+      let choosePlayer = document.getElementById("choose-player");
+
+      function updatePlayer1(character) {
+        player1 = character;
+        document.getElementById("player1").textContent = player1;
+        currentPlayer = player1;
+      }
+
+      characters.forEach((character) => {
+        let button = document.createElement("button");
+        button.textContent = character;
+        button.style.fontSize = "24px";
+        button.style.margin = "5px";
+        button.style.cursor = "pointer";
+        button.addEventListener("click", function () {
+          updatePlayer1(character);
+          choosePlayer.style.display = "none";
+        });
+        choosePlayer.appendChild(button);
+      });
+
+      document.getElementById("player1").textContent = player1;
+      document.getElementById("computer").textContent = computer;
+
+      let gameBoard = document.getElementById("game-board");
+      let gameSquares = [];
+
+      function createGameSquare() {
+        for (let i = 0; i < 9; i++) {
+          let square = document.createElement("div");
+          square.setAttribute("data-index", i);
+          square.className = "game-square";
+          gameBoard.appendChild(square);
+          gameSquares.push(square);
+        }
+      }
+
+      function checkForWinner() {
+        // Check rows
+        for (let i = 0; i < 3; i++) {
+          if (
+            gameSquares[i * 3].textContent ===
+              gameSquares[i * 3 + 1].textContent &&
+            gameSquares[i * 3].textContent ===
+              gameSquares[i * 3 + 2].textContent &&
+            gameSquares[i * 3].textContent !== ""
+          ) {
+            return true;
+          }
+        }
+
+        // Check columns
+        for (let i = 0; i < 3; i++) {
+          let value = gameSquares[i].textContent;
+          for (let j = 0; j < 3; j++) {
+            if (gameSquares[i * 3 + j].textContent !== value) {
+              return false;
+            }
+          }
+        }
+        return true;
+
+        // Check diagonals
+        if (
+          // Top-left to bottom-right diagonal
+          (gameSquares[0].textContent === gameSquares[4].textContent &&
+            gameSquares[0].textContent === gameSquares[8].textContent &&
+            gameSquares[0].textContent !== "") ||
+          // Top-right to bottom-left diagonal
+          (gameSquares[2].textContent === gameSquares[4].textContent &&
+            gameSquares[2].textContent === gameSquares[6].textContent &&
+            gameSquares[2].textContent !== "")
+        ) {
+          // Game over!
+          alert("It's a draw!");
+          setTimeout(function () {
+            location.reload();
+          }, 1000);
+        }
+
+        return false;
+      }
+
+      function updateGameSquare(index) {
+        let square = gameSquares[index];
+        if (currentPlayer === player1) {
+          // user's turn
+          square.textContent = currentPlayer;
+          currentPlayer = computer;
+        } else {
+          // computer's turn
+          let availableSquares = [];
+          for (let i = 0; i < gameSquares.length; i++) {
+            if (!gameSquares[i].textContent) {
+              availableSquares.push(i);
+            }
+          }
+          let computerMoveIndex = Math.floor(
+            Math.random() * availableSquares.length
+          );
+          let computerMove = availableSquares[computerMoveIndex];
+          gameSquares[computerMove].textContent = currentPlayer;
+          currentPlayer = player1;
+        }
+      }
+
+      createGameSquare();
+
+      for (let i = 0; i < gameSquares.length; i++) {
+        gameSquares[i].addEventListener("click", function () {
+          let audio = new Audio("./audio/click.wav");
+          audio.play();
+
+          let index = this.getAttribute("data-index");
+          if (!this.textContent) {
+            updateGameSquare(index);
+            if (checkForWinner()) {
+              document.querySelector(".confetti-piece").innerHTML =
+                currentPlayer;
+              document.getElementById("confetti").style.display = "block";
+
+              alert(
+                `Player ${currentPlayer === player1 ? computer : player1} wins!`
+              );
+              setTimeout(function () {
+                location.reload();
+              }, 1000);
+            }
+          } else if (currentPlayer === computer) {
+            // computer's turn
+            updateGameSquare(Math.floor(Math.random() * gameSquares.length));
+          }
+        });
+      }
+    </script>
+  </body>
+</html>
