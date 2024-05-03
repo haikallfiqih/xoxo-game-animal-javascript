@@ -8,4 +8,6 @@ Feel free to spin the characters of yours!
 
 And also i left some bug in case you wanna try to solve it for your excercise.
 
+[Play it here](https://haikallfiqih.github.io/xoxo-game-animal-javascript/ "Start Play")
+
 #### Dont forget to give it star if you like it! Enjoy🐣
